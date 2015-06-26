@@ -62,9 +62,7 @@ def __patched__exit__(self, exc_type, exc_value, traceback):
         connection.in_atomic_block = False
 
     try:
-        if connection.closed_in_transaction:
-            # The database will perform a rollback by itself.
-            # Wait until we exit the outermost block.
+        if getattr(connection, 'closed_in_transaction', None):
             pass
 
         elif exc_type is None and not connection.needs_rollback:
@@ -137,7 +135,7 @@ def __patched__exit__(self, exc_type, exc_value, traceback):
     finally:
         # Outermost block exit when autocommit was enabled.
         if not connection.in_atomic_block:
-            if connection.closed_in_transaction:
+            if getattr(connection, 'closed_in_transaction', None):
                 connection.connection = None
             elif connection.features.autocommits_when_autocommit_is_off:
                 connection.autocommit = True
@@ -145,7 +143,7 @@ def __patched__exit__(self, exc_type, exc_value, traceback):
                 connection.set_autocommit(True)
         # Outermost block exit when autocommit was disabled.
         elif not connection.savepoint_ids and not connection.commit_on_exit:
-            if connection.closed_in_transaction:
+            if getattr(connection, 'closed_in_transaction', None):
                 connection.connection = None
             else:
                 connection.in_atomic_block = False

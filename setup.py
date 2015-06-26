@@ -16,8 +16,6 @@ setup(
     license="Simplified BSD",
     packages=["djcelery_transactions"],
     install_requires=[
-        "celery>=2.2.7",
-        "Django>=1.2.4",
     ],
     classifiers=[
         "Framework :: Django",
